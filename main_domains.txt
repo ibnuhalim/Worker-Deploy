@@ -1,0 +1,9 @@
+blueivy.qzz.io
+cranberry.qzz.io
+gainsboro.qzz.io
+gulfblue.qzz.io
+heavenlyblue.qzz.io
+iceberg.qzz.io
+purplelily.qzz.io
+tronblue.qzz.io
+vermilion.qzz.io
