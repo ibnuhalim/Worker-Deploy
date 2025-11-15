@@ -1,117 +1,184 @@
-🌙 Cloudflare Worker Auto-Deployment Guide
-<p align="center"><b>Dark Theme · Dual Language · 2 Columns · GitHub Compatible</b></p>
-<table> <tr> <td width="50%" valign="top"> <h2 style="color:#86c5ff;">🇺🇸 English Version</h2> <h3 style="color:#ffd27f;">🚀 Overview</h3> Automated deployment system for Cloudflare Worker using GitHub Actions. Supports: - Auto route creation - Multi-domain sharding - Timeout-safe deployment <h3 style="color:#ff7f7f;">⚠️ Issue: Cloudflare 504 Timeout</h3> Too many routes in one Worker may trigger:
-504 Timeout – Cloudflare API took too long to respond
+🚀 Cloudflare Worker Auto-Deployment Guide
+GitHub Actions · Zero-Timeout · Multi-Domain Ready
+Panduan Deploy Worker Otomatis · Anti Timeout · Multi Domain
+🌐 ENGLISH VERSION
+⭐ Overview
+
+This guide explains two automated deployment strategies for Cloudflare Worker using GitHub Actions:
+
+Fully automated Worker deployment
+
+Automatic domain & subdomain routing
+
+Timeout-safe deployment up to hundreds of domains
+
+⚠️ Common Problem: Cloudflare 504 Timeout
+
+Deploying many routes in one Worker often triggers:
+
+504 Timeout — Cloudflare API took too long to respond
 
 
-Two strategies are available to prevent this.
+To avoid this, two deployment approaches are provided.
 
-<h3 style="color:#a3ffac;">🔍 Strategy Comparison</h3>
+🔍 Strategy Comparison
 Strategy	Description	Best For
-Legacy (Single Worker)	All routes in one Worker	Small projects
-Sharded (Multi Worker)	One Worker per domain	Large projects
-<h3 style="color:#ff9bf0;">📦 Required Files</h3>
-File	Purpose
-worker.js	Worker script
-customdomain.txt	Subdomain prefixes
-main_domains.txt	Domain list
-[Deploy Injektor].yml	Legacy workflow
-deploy_chunked.yml	Sharded workflow
-<h3 style="color:#ffd27f;">🧰 Legacy Mode</h3> **Workflow:** `[Deploy Injektor].yml`
+1. Legacy – Single Worker	All routes inside one Worker	Small projects (<50 routes)
+2. Sharded – Multi Worker	One Worker per domain	Large projects, 100+ domains
+📦 Required Repository Files
+File	Description	Used By
+worker.js	Worker script	Both
+customdomain.txt	Subdomain prefixes	Both
+main_domains.txt	Domain list	Sharded
+[Deploy Injektor].yml	Legacy deployment	Legacy
+deploy_chunked.yml	Multi-worker sharding	Sharded
+🧰 Strategy 1 — Legacy (Single Worker)
 
-Inputs:
+Workflow: [Deploy Injektor].yml
 
-worker_name
-
-main_domain
-
-Cloudflare API credentials
-
-Flow:
-
-Load main domain
-
-Read prefixes
-
-Build route list
-
-Deploy one Worker
-
-<h3 style="color:#a3ffac;">🧩 Sharded Mode</h3> **Workflow:** `deploy_chunked.yml`
-
-Inputs:
-
-Cloudflare API token
-
-Cloudflare account ID
-
-Flow:
-
-One Worker per domain
-
-Auto-named Worker
-
-Build routes automatically
-
-Deploy sequentially
-
-20s cooldown
-
-<h3 style="color:#fad08c;">▶️ Run</h3> 1. Open GitHub Actions 2. Select workflow 3. Enter credentials 4. Deploy 🎉 </td> <td width="50%" valign="top" style="border-left:1px solid #333; padding-left:15px;"> <h2 style="color:#86c5ff;">🇮🇩 Versi Indonesia</h2> <h3 style="color:#ffd27f;">🚀 Ringkasan</h3> Sistem deployment otomatis untuk Cloudflare Worker menggunakan GitHub Actions. Mendukung: - Pembuatan rute otomatis - Multi-domain sharding - Anti timeout <h3 style="color:#ff7f7f;">⚠️ Masalah: Cloudflare 504 Timeout</h3> Jika terlalu banyak rute digabung, Cloudflare memunculkan:
-504 Timeout – API Cloudflare terlambat merespons
-
-
-Ada dua metode deployment sebagai solusi.
-
-<h3 style="color:#a3ffac;">🔍 Perbandingan Strategi</h3>
-Strategi	Penjelasan	Cocok Untuk
-Legacy (Single Worker)	Semua rute digabung	Proyek kecil
-Sharded (Multi Worker)	1 domain = 1 Worker	Proyek besar
-<h3 style="color:#ff9bf0;">📦 File yang Dibutuhkan</h3>
-File	Fungsi
-worker.js	Script Worker
-customdomain.txt	Prefix subdomain
-main_domains.txt	Daftar domain
-[Deploy Injektor].yml	Workflow Legacy
-deploy_chunked.yml	Workflow Sharded
-<h3 style="color:#ffd27f;">🧰 Mode Legacy</h3> **Workflow:** `[Deploy Injektor].yml`
-
-Input:
+Required Inputs
 
 worker_name
 
 main_domain
 
-API credentials
+Cloudflare API Token + Account ID
 
-Alur:
+How It Works
+
+Loads main domain
+
+Reads prefixes from customdomain.txt
+
+Generates a single large route list
+
+Deploys one Worker
+
+Not recommended for large-scale projects due to timeout risk.
+
+🧩 Strategy 2 — Multi-Worker Sharding (Recommended)
+
+Workflow: deploy_chunked.yml
+
+Required Inputs
+
+cloudflare_account_id
+
+cloudflare_api_token
+
+How It Works
+Step	Description	Purpose
+Loader	Reads domain list	Determine workers
+Generator	Creates one Worker per domain	Avoid overload
+Route Builder	Combines prefixes from customdomain.txt	Full automation
+Serial Deploy	Deploys workers one-by-one	Prevent conflicts
+Cooldown	Waits 20s between deploys	Prevent API 504
+
+This method can handle 100–500+ domains without issues.
+
+▶️ Running the Deployment
+
+Open Actions tab
+
+Select workflow:
+
+Legacy → [Deploy Injektor]
+
+Sharded → Deploy Chunked Multi-Domain
+
+Click Run workflow
+
+Enter Cloudflare credentials
+
+Done 🎉
+
+🇮🇩 VERSI BAHASA INDONESIA
+⭐ Ringkasan
+
+Panduan ini menjelaskan dua metode deployment Worker Cloudflare secara otomatis menggunakan GitHub Actions:
+
+Deployment otomatis Worker
+
+Pembuatan rute domain/subdomain otomatis
+
+Deploy stabil tanpa risiko 504 Timeout
+
+⚠️ Masalah Umum: Timeout 504 Cloudflare
+
+Jika terlalu banyak rute digabung dalam satu Worker, API Cloudflare gagal memproses dan muncul:
+
+504 Timeout — Permintaan API terlalu lama diproses
+
+
+Solusinya: gunakan metode sesuai kebutuhan proyek.
+
+🔍 Perbandingan Strategi
+Strategi	Deskripsi	Cocok Untuk
+1. Legacy – Single Worker	Semua rute dijadikan satu Worker	Proyek kecil (<50 rute)
+2. Sharded – Multi Worker	Satu domain = satu Worker	Proyek besar (100+ domain)
+📦 File Wajib di Repository
+File	Fungsi	Digunakan Oleh
+worker.js	Script Worker	Semua
+customdomain.txt	Daftar prefix subdomain	Semua
+main_domains.txt	Daftar domain utama	Sharded
+[Deploy Injektor].yml	Workflow metode Legacy	Legacy
+deploy_chunked.yml	Workflow multi-worker	Sharded
+🧰 Strategi 1 — Legacy (Single Worker)
+
+Workflow: [Deploy Injektor].yml
+
+Input yang Dibutuhkan
+
+worker_name
+
+main_domain
+
+API Token & Account ID Cloudflare
+
+Cara Kerja
 
 Membaca domain utama
 
-Memuat prefix
+Mengambil prefix dari customdomain.txt
 
-Menggabungkan rute
+Menggabungkan semua rute
 
-Deploy satu Worker
+Deploy 1 Worker untuk semua rute
 
-<h3 style="color:#a3ffac;">🧩 Mode Sharded</h3> **Workflow:** `deploy_chunked.yml`
+Tidak cocok untuk jumlah domain besar (rawan timeout).
 
-Input:
+🧩 Strategi 2 — Multi-Worker Sharding (Direkomendasikan)
 
-API token
+Workflow: deploy_chunked.yml
 
-Account ID Cloudflare
+Input yang Dibutuhkan
 
-Alur:
+cloudflare_account_id
 
-Tiap domain → Worker unik
+cloudflare_api_token
 
-Nama Worker otomatis
+Cara Kerja
+Tahap	Fungsi	Tujuan
+Loader	Membaca semua domain	Menentukan Worker
+Generator	Membuat Worker per domain	Menghindari beban berlebih
+Route Builder	Menggabungkan prefix subdomain	Otomatis
+Deploy Serial	Deploy satu per satu	Anti bentrok API
+Cooldown	Tunggu 20 detik	Cegah Timeout 504
 
-Rute otomatis
+Aman digunakan untuk ratusan hingga ribuan rute.
 
-Deploy satu per satu
+▶️ Cara Menjalankan Workflow
 
-Jeda 20 detik
+Buka tab Actions
 
-<h3 style="color:#fad08c;">▶️ Jalankan</h3> 1. Masuk GitHub Actions 2. Pilih workflow 3. Isi kredensial 4. Deploy otomatis 🎉 </td> </tr> </table>
+Pilih workflow:
+
+Legacy → [Deploy Injektor]
+
+Sharded → Deploy Chunked Multi-Domain
+
+Klik Run workflow
+
+Masukkan kredensial Cloudflare
+
+Deployment berjalan otomatis 🎉
