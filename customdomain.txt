@@ -61,3 +61,4 @@ cf.shopee.co.id.sea-sw.swiftserve.com
 web.poe.garena.com
 www.freefiremobile.com
 dl.cvs.freefiremobile.com
+live.iflix.com
